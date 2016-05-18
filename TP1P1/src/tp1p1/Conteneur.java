@@ -20,10 +20,13 @@ public class Conteneur<K extends Comparable<K> & Serializable, V extends Seriali
     private TreeMap<K,V> tM;
     private K cleCourante;
     public Conteneur(){
-        this.tM = new TreeMap<>;
+        this.tM=new TreeMap<K,V>();
+        cleCourante=null;
+        
     }
     public Conteneur(java.util.TreeMap<K,V> t){
         this.tM=t;
+        cleCourante=t.firstKey();
     }
     
    public boolean ajouter(K cle, V valeur){
@@ -109,5 +112,7 @@ public class Conteneur<K extends Comparable<K> & Serializable, V extends Seriali
    public void vider(){
        tM.clear();
    }
+
+}
    
 

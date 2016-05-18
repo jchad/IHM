@@ -5,8 +5,14 @@
  */
 package tp1p1;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import java.util.*;
+
 
 /**
  *
@@ -15,6 +21,29 @@ import static org.junit.Assert.*;
 public class ConteneurTest {
     
     public ConteneurTest() {
+    }
+    private static Conteneur<Integer, String> instance;
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+      TreeMap<Integer, String> tM = new TreeMap<>();
+       tM.put(1,"dfgg");
+       tM.put(2, "dfdsfgsg");
+       tM.put(3, "sdfsgsg");
+       Conteneur instance = new Conteneur<>(tM);
+    }
+    
+    
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
+
+    @Before
+    public void setUp() throws Exception {
+    }
+
+    @After
+    public void tearDown() throws Exception {
     }
 
     /**
@@ -25,13 +54,11 @@ public class ConteneurTest {
         System.out.println("ajouter");
         Object cle = null;
         Object valeur = null;
-        Conteneur instance = new Conteneur();
         boolean expResult = false;
         boolean result;
-        result = instance.ajouter(cle, valeur);
+        result = instance.ajouter((Integer)cle, (String)valeur);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -43,6 +70,19 @@ public class ConteneurTest {
         String nomFic = "";
         Conteneur instance = new Conteneur();
         instance.charger(nomFic);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of sauvegarder method, of class Conteneur.
+     */
+    @Test
+    public void testSauvegarder() {
+        System.out.println("sauvegarder");
+        String nomFic = "";
+        Conteneur instance = new Conteneur();
+        instance.sauvegarder(nomFic);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -225,19 +265,6 @@ public class ConteneurTest {
     }
 
     /**
-     * Test of sauvegarder method, of class Conteneur.
-     */
-    @Test
-    public void testSauvegarder() {
-        System.out.println("sauvegarder");
-        String nomFic = "";
-        Conteneur instance = new Conteneur();
-        instance.sauvegarder(nomFic);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of suivant method, of class Conteneur.
      */
     @Test
@@ -273,5 +300,5 @@ public class ConteneurTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-    
-}
+
+   
