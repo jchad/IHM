@@ -21,7 +21,15 @@ public class Commercial extends Employe{
     }
     @Override
     public float calculPaie(){
-        return super.
+        return super.calculPaie()+this.pourcentage*this.totalVentes;
+    }
+
+    public float getPourcentage() {
+        return pourcentage;
+    }
+
+    public float getTotalVentes() {
+        return totalVentes;
     }
     
 }
