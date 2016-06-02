@@ -30,13 +30,78 @@ public class Fenetre extends javax.swing.JFrame {
     
     private void modeaffichage(){
         modeCourant= ModeCourant.AFFICHAGE;
-        
+        l_mode.setText("MODE AFFICHAGE");
+        bt_lancer.setVisible(false);
+        tf_mat.setEnabled(false);
+        tf_mat.setBackground(Color.CYAN);
+        tf_indem.setEnabled(false);
+        tf_mb.setEnabled(false);
+        tf_nbh.setEnabled(false);
+        tf_nom.setEnabled(false);
+        tf_pour.setEnabled(false);
+        tf_taux.setEnabled(false);
+        tf_tel.setEnabled(false);
+        tf_ventes.setEnabled(false);
+        rb_commercial.setEnabled(false);
+        rb_directeur.setEnabled(false);
+        rb_employe.setEnabled(false);
+        bt_chercher.setVisible(false);    
+        }
+    
+    private void modeRecherche(){
+        modeCourant= ModeCourant.RECHERCHE;
+        l_mode.setText("MODE RECHERCHE");
+        bt_chercher.setVisible(false);
+        bt_creer.setVisible(false);
+        bt_supprimer.setVisible(false);
+        this.effacer();
+        tf_mat.setEnabled(true);
+        tf_mat.setEditable(true);
+        if (!tf_mat.isFocusable())
+            tf_mat.setFocusable(true);
+        tf_mat.requestFocus();
+        tf_indem.setEnabled(false);
+        tf_mb.setEnabled(false);
+        tf_nbh.setEnabled(false);
+        tf_nom.setEnabled(false);
+        tf_pour.setEnabled(false);
+        tf_taux.setEnabled(false);
+        tf_tel.setEnabled(false);
+        tf_ventes.setEnabled(false);
+        rb_commercial.setEnabled(false);
+        rb_directeur.setEnabled(false);
+        rb_employe.setEnabled(false);
+        bt_lancer.setVisible(false);
     }
     
+    private void modeSaisie(){
+        modeCourant= ModeCourant.SAISIE;
+        l_mode.setText("MODE SAISIE");
+        tf_mat.setEnabled(false);
+        bt_lancer.setVisible(false);
+        rb_employe.setEnabled(true);
+        rb_employe.setSelected(true); 
+        typePersonnel = TypePersonnel.EMPLOYE; 
+        rb_commercial.setEnabled(true);
+        rb_directeur.setEnabled(true);
+        bt_creer.setText("Ajouter");
+        bt_creer.setEnabled(false);
+        bt_creer.setToolTipText("Ajouter ce nouveau personnel");
+        bt_chercher.setEnabled(false);
+        bt_supprimer.setEnabled(false);
+        bt_debut.setEnabled(false);
+        
+    }
     private void effacer(){
-        /**
-         * Mettre tout les champs de texte à blanc chaine ""
-         */
+        tf_indem.setText("");
+        tf_mat.setText("");
+        tf_mb.setText("");
+        tf_nbh.setText("");
+        tf_nom.setText("");
+        tf_pour.setText("");
+        tf_taux.setText("");
+        tf_tel.setText("");
+        tf_ventes.setText("");
     }
     
     /**
@@ -49,26 +114,26 @@ public class Fenetre extends javax.swing.JFrame {
     private void initComponents() {
 
         TypesEmployés = new javax.swing.ButtonGroup();
-        jLabel1 = new javax.swing.JLabel();
+        l_img1 = new javax.swing.JLabel();
         p_infogen = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        l_mat = new javax.swing.JLabel();
+        l_tel = new javax.swing.JLabel();
+        l_nom = new javax.swing.JLabel();
         tf_tel = new javax.swing.JTextField();
         tf_nom = new javax.swing.JTextField();
         tf_mat = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        l_img2 = new javax.swing.JLabel();
         p_typeemp = new javax.swing.JPanel();
         rb_employe = new javax.swing.JRadioButton();
         rb_commercial = new javax.swing.JRadioButton();
         rb_directeur = new javax.swing.JRadioButton();
         p_calculrem = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
+        l_taux = new javax.swing.JLabel();
+        l_nbh = new javax.swing.JLabel();
+        l_indem = new javax.swing.JLabel();
+        l_ventes = new javax.swing.JLabel();
+        l_pour = new javax.swing.JLabel();
+        l_mb = new javax.swing.JLabel();
         tf_taux = new javax.swing.JTextField();
         tf_nbh = new javax.swing.JTextField();
         tf_indem = new javax.swing.JTextField();
@@ -79,12 +144,15 @@ public class Fenetre extends javax.swing.JFrame {
         bt_chercher = new javax.swing.JButton();
         bt_supprimer = new javax.swing.JButton();
         bt_creer = new javax.swing.JButton();
-        jLabel13 = new javax.swing.JLabel();
+        l_nb = new javax.swing.JLabel();
+        l_nbElem = new javax.swing.JLabel();
+        bt_lancer = new javax.swing.JButton();
         p_nav = new javax.swing.JPanel();
         bt_debut = new javax.swing.JButton();
         bt_prec = new javax.swing.JButton();
         bt_fin = new javax.swing.JButton();
         bt_suiv = new javax.swing.JButton();
+        l_mode = new javax.swing.JLabel();
         m_menubar = new javax.swing.JMenuBar();
         m_menufile = new javax.swing.JMenu();
         mi_new = new javax.swing.JMenuItem();
@@ -96,17 +164,17 @@ public class Fenetre extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("Informations générales"); // NOI18N
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Personnel/logo1.gif"))); // NOI18N
+        l_img1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Personnel/logo1.gif"))); // NOI18N
 
         p_infogen.setBorder(javax.swing.BorderFactory.createTitledBorder("Informations générales"));
         p_infogen.setToolTipText("Informations génrérales");
         p_infogen.setName("Informations générales"); // NOI18N
 
-        jLabel5.setText("Matricule");
+        l_mat.setText("Matricule");
 
-        jLabel4.setText("Tel");
+        l_tel.setText("Tel");
 
-        jLabel3.setText("Nom");
+        l_nom.setText("Nom");
 
         tf_tel.setToolTipText("");
         tf_tel.addActionListener(new java.awt.event.ActionListener() {
@@ -123,14 +191,14 @@ public class Fenetre extends javax.swing.JFrame {
             p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(p_infogenLayout.createSequentialGroup()
                 .addGroup(p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
+                    .addComponent(l_nom)
+                    .addComponent(l_tel))
                 .addGap(18, 18, 18)
                 .addGroup(p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(p_infogenLayout.createSequentialGroup()
                         .addComponent(tf_tel, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel5)
+                        .addComponent(l_mat)
                         .addGap(18, 18, 18)
                         .addComponent(tf_mat, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(11, 11, 11))
@@ -142,18 +210,18 @@ public class Fenetre extends javax.swing.JFrame {
             p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(p_infogenLayout.createSequentialGroup()
                 .addGroup(p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
+                    .addComponent(l_nom)
                     .addComponent(tf_nom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addGroup(p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel4)
+                    .addComponent(l_mat)
+                    .addComponent(l_tel)
                     .addComponent(tf_tel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tf_mat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Personnel/logo2.gif"))); // NOI18N
+        l_img2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Personnel/logo2.gif"))); // NOI18N
 
         p_typeemp.setBorder(javax.swing.BorderFactory.createTitledBorder("Type d'employés"));
 
@@ -192,17 +260,17 @@ public class Fenetre extends javax.swing.JFrame {
 
         p_calculrem.setBorder(javax.swing.BorderFactory.createTitledBorder("Informations pour le calcul de la rémunération"));
 
-        jLabel7.setText("Taux Horraire");
+        l_taux.setText("Taux Horraire");
 
-        jLabel8.setText("Nombres d'heures");
+        l_nbh.setText("Nombres d'heures");
 
-        jLabel9.setText("Indemnités");
+        l_indem.setText("Indemnités");
 
-        jLabel10.setText("Ventes");
+        l_ventes.setText("Ventes");
 
-        jLabel11.setText("Pourcentage");
+        l_pour.setText("Pourcentage");
 
-        jLabel12.setText("Montant Brut");
+        l_mb.setText("Montant Brut");
 
         javax.swing.GroupLayout p_calculremLayout = new javax.swing.GroupLayout(p_calculrem);
         p_calculrem.setLayout(p_calculremLayout);
@@ -214,27 +282,27 @@ public class Fenetre extends javax.swing.JFrame {
                     .addGroup(p_calculremLayout.createSequentialGroup()
                         .addGroup(p_calculremLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(p_calculremLayout.createSequentialGroup()
-                                .addComponent(jLabel7)
+                                .addComponent(l_taux)
                                 .addGap(29, 29, 29)
                                 .addComponent(tf_taux, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(p_calculremLayout.createSequentialGroup()
-                                .addComponent(jLabel8)
+                                .addComponent(l_nbh)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(p_calculremLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(tf_nbh)
                                     .addComponent(tf_indem))))
                         .addGap(31, 31, 31)
                         .addGroup(p_calculremLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
-                            .addComponent(jLabel10))
+                            .addComponent(l_pour)
+                            .addComponent(l_ventes))
                         .addGap(18, 18, 18)
                         .addGroup(p_calculremLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(tf_ventes, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(tf_pour, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(p_calculremLayout.createSequentialGroup()
-                        .addComponent(jLabel9)
+                        .addComponent(l_indem)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel12)
+                        .addComponent(l_mb)
                         .addGap(18, 18, 18)
                         .addComponent(tf_mb, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(53, Short.MAX_VALUE))
@@ -244,21 +312,21 @@ public class Fenetre extends javax.swing.JFrame {
             .addGroup(p_calculremLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(p_calculremLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel10)
+                    .addComponent(l_taux)
+                    .addComponent(l_ventes)
                     .addComponent(tf_taux, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tf_ventes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(p_calculremLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel11)
+                    .addComponent(l_nbh)
+                    .addComponent(l_pour)
                     .addComponent(tf_nbh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tf_pour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(p_calculremLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
+                    .addComponent(l_mb)
                     .addComponent(tf_mb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
+                    .addComponent(l_indem)
                     .addComponent(tf_indem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -276,7 +344,16 @@ public class Fenetre extends javax.swing.JFrame {
 
         bt_creer.setText("Creer");
 
-        jLabel13.setText("Nombre d'objets présents dans le conteneur :");
+        l_nb.setText("Nombre d'objets présents dans le conteneur :");
+
+        l_nbElem.setText(" ");
+
+        bt_lancer.setText("Lancer");
+        bt_lancer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_lancerActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout p_gestcontLayout = new javax.swing.GroupLayout(p_gestcont);
         p_gestcont.setLayout(p_gestcontLayout);
@@ -286,15 +363,19 @@ public class Fenetre extends javax.swing.JFrame {
                 .addGap(43, 43, 43)
                 .addGroup(p_gestcontLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(p_gestcontLayout.createSequentialGroup()
+                        .addComponent(bt_lancer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bt_chercher)
-                        .addGap(118, 118, 118)
-                        .addComponent(bt_supprimer))
+                        .addGap(50, 50, 50)
+                        .addComponent(bt_supprimer)
+                        .addGap(54, 54, 54)
+                        .addComponent(bt_creer))
                     .addGroup(p_gestcontLayout.createSequentialGroup()
                         .addGap(44, 44, 44)
-                        .addComponent(jLabel13)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(bt_creer)
-                .addGap(60, 60, 60))
+                        .addComponent(l_nb)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(l_nbElem)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         p_gestcontLayout.setVerticalGroup(
             p_gestcontLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,9 +384,12 @@ public class Fenetre extends javax.swing.JFrame {
                 .addGroup(p_gestcontLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bt_chercher)
                     .addComponent(bt_supprimer)
-                    .addComponent(bt_creer))
+                    .addComponent(bt_creer)
+                    .addComponent(bt_lancer))
                 .addGap(18, 18, 18)
-                .addComponent(jLabel13)
+                .addGroup(p_gestcontLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(l_nb)
+                    .addComponent(l_nbElem))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -350,6 +434,8 @@ public class Fenetre extends javax.swing.JFrame {
                     .addComponent(bt_suiv))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        l_mode.setText(" ");
 
         m_menufile.setText("File");
 
@@ -404,9 +490,11 @@ public class Fenetre extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(l_img1)
+                        .addGap(47, 47, 47)
+                        .addComponent(l_mode)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel2))
+                        .addComponent(l_img2))
                     .addComponent(p_infogen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(p_typeemp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(p_calculrem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -419,10 +507,12 @@ public class Fenetre extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addComponent(l_img1)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(jLabel2)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(l_mode)
+                            .addComponent(l_img2))))
                 .addGap(18, 18, 18)
                 .addComponent(p_infogen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -468,7 +558,14 @@ public class Fenetre extends javax.swing.JFrame {
     private void bt_chercherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_chercherActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_bt_chercherActionPerformed
-    
+
+    private void bt_lancerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_lancerActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bt_lancerActionPerformed
+    private void bt_creerActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        // TODO add your handling code here:
+        if (bt)
+    }   
     /**
      * @param args the command line arguments
      */
@@ -510,21 +607,24 @@ public class Fenetre extends javax.swing.JFrame {
     private javax.swing.JButton bt_creer;
     private javax.swing.JButton bt_debut;
     private javax.swing.JButton bt_fin;
+    private javax.swing.JButton bt_lancer;
     private javax.swing.JButton bt_prec;
     private javax.swing.JButton bt_suiv;
     private javax.swing.JButton bt_supprimer;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel l_img1;
+    private javax.swing.JLabel l_img2;
+    private javax.swing.JLabel l_indem;
+    private javax.swing.JLabel l_mat;
+    private javax.swing.JLabel l_mb;
+    private javax.swing.JLabel l_mode;
+    private javax.swing.JLabel l_nb;
+    private javax.swing.JLabel l_nbElem;
+    private javax.swing.JLabel l_nbh;
+    private javax.swing.JLabel l_nom;
+    private javax.swing.JLabel l_pour;
+    private javax.swing.JLabel l_taux;
+    private javax.swing.JLabel l_tel;
+    private javax.swing.JLabel l_ventes;
     private javax.swing.JMenuBar m_menubar;
     private javax.swing.JMenu m_menufile;
     private javax.swing.JMenu m_menuhelp;
