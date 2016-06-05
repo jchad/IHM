@@ -114,6 +114,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
         tf_ventes.setText("");
     }
     private  void afficher(){
+        this.modeAffichage();
         this.effacer();
         l_nbElem.setText(Integer.toString(total));
         if (total!=0){
@@ -140,6 +141,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
         }
     }
      private void saisir(){
+            this.modeSaisie();
             tf_nom.setEnabled(true);
             tf_tel.setEnabled(true);
             if (typePersonnel == TypePersonnel.EMPLOYE) {
@@ -155,6 +157,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
             }
         }
     private void rechercher(){
+        this.modeRecherche();
         if (cont.existe(tf_mat.getText())){
             cont.positionner(tf_mat.getText());
             this.afficher();
@@ -163,7 +166,25 @@ public class fenetreGesPer extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Matricule inexistant", "Ok", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+    private void ajouter(){
+        String nom = tf_nom.getText();
+        String tel = tf_tel.getText();
+        float txh = this.parseFloat(tf_taux.getText());
+        float nbh = this.parseFloat(tf_nbh.getText());
+        float indem = this.parseFloat(tf_indem.getText());
+        float pour = this.parseFloat(tf_pour.getText());
+        float ventes = this.parseFloat(tf_ventes.getText());
+        if (typePersonnel == TypePersonnel.EMPLOYE){
+            Employe emp = new Employe(nom, tel, txh, nbh);
+            cont.ajouter(emp.getNumPerson(), emp);
+        }else if (typePersonnel == TypePersonnel.COMMERCIAL){
+            Commercial com = new Commercial(nom, tel, txh, nbh, pour, ventes);
+            cont.ajouter(com.getNumPerson(),com);
+        }else if (typePersonnel == TypePersonnel.DIRECTEUR){
+            Directeur dir = new Directeur(nom, tel, indem);
+            cont.ajouter(dir.getNumPerson(),dir);            
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -289,12 +310,27 @@ public class fenetreGesPer extends javax.swing.JFrame {
 
         TypesEmployés.add(rb_employe);
         rb_employe.setText("Employé");
+        rb_employe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_employeActionPerformed(evt);
+            }
+        });
 
         TypesEmployés.add(rb_commercial);
         rb_commercial.setText("Commercial");
+        rb_commercial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_commercialActionPerformed(evt);
+            }
+        });
 
         TypesEmployés.add(rb_directeur);
         rb_directeur.setText("Directeur");
+        rb_directeur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_directeurActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout p_typeempLayout = new javax.swing.GroupLayout(p_typeemp);
         p_typeemp.setLayout(p_typeempLayout);
@@ -409,8 +445,18 @@ public class fenetreGesPer extends javax.swing.JFrame {
         });
 
         bt_supprimer.setText("Supprimer");
+        bt_supprimer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_supprimerActionPerformed(evt);
+            }
+        });
 
         bt_creer.setText("Creer");
+        bt_creer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_creerActionPerformed(evt);
+            }
+        });
 
         l_nb.setText("Nombre d'objets présents dans le conteneur :");
 
@@ -464,10 +510,25 @@ public class fenetreGesPer extends javax.swing.JFrame {
         p_nav.setBorder(javax.swing.BorderFactory.createTitledBorder("Navigation dans le conteneur"));
 
         bt_debut.setText("Début");
+        bt_debut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_debutActionPerformed(evt);
+            }
+        });
 
         bt_prec.setText("<<");
+        bt_prec.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_precActionPerformed(evt);
+            }
+        });
 
         bt_fin.setText("Fin");
+        bt_fin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_finActionPerformed(evt);
+            }
+        });
 
         bt_suiv.setText(">>");
         bt_suiv.addActionListener(new java.awt.event.ActionListener() {
@@ -628,26 +689,78 @@ public class fenetreGesPer extends javax.swing.JFrame {
     }//GEN-LAST:event_tf_telActionPerformed
 
     private void bt_suivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_suivActionPerformed
-        // TODO add your handling code here:
         cont.suivant();
-        
+        this.afficher();
     }//GEN-LAST:event_bt_suivActionPerformed
 
     private void bt_chercherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_chercherActionPerformed
-        // TODO add your handling code here:
+        this.rechercher();
     }//GEN-LAST:event_bt_chercherActionPerformed
 
     private void bt_lancerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_lancerActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_bt_lancerActionPerformed
 
     private void tf_mbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_mbActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tf_mbActionPerformed
-    private void bt_creerActionPerformed(java.awt.event.ActionEvent evt) {                                            
+
+    private void bt_creerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_creerActionPerformed
+                /* on peut arriver a ce bouton pour 2 raisons : pour creer un
+        nouveau Personnel ou pour valider une saisie de Personnel en
+        l'ajoutant au conteneur : */
+        if (bt_creer.getText().compareTo("AJOUTER") == 0) {
+            /* on aurait pu faire un test sur modeCourant... si on a
+           AJOUTER, on est en mode SAISIE : il faut ajouter le Personnel au
+           conteneur */
+            this.ajouter(); /* cette méthode va ajouter l’élément dans
+           le conteneur */
+            this.modeAffichage(); /* on bascule en mode Affichage
+           apres chaque saisie */
+            this.afficher();
+        } else { /* bouton CREER : on est en mode AFFICHAGE et on veut
+            passer en mode Saisie */
+            this.effacer(); /* au cas ou il y a eu une saisie
+            précédente */
+            this.modeSaisie();
+            this.saisir();
+        }
+    }//GEN-LAST:event_bt_creerActionPerformed
+
+    private void rb_employeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_employeActionPerformed
+        typePersonnel = TypePersonnel.EMPLOYE;
+        saisir();
+    }//GEN-LAST:event_rb_employeActionPerformed
+
+    private void rb_commercialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_commercialActionPerformed
+        typePersonnel = TypePersonnel.COMMERCIAL;
+        saisir();
+    }//GEN-LAST:event_rb_commercialActionPerformed
+
+    private void rb_directeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_directeurActionPerformed
+        typePersonnel = TypePersonnel.DIRECTEUR;
+        saisir();
+    }//GEN-LAST:event_rb_directeurActionPerformed
+
+    private void bt_debutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_debutActionPerformed
+        cont.premier();
+        this.afficher();
+    }//GEN-LAST:event_bt_debutActionPerformed
+
+    private void bt_precActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_precActionPerformed
+        cont.precedent();
+        this.afficher();
+    }//GEN-LAST:event_bt_precActionPerformed
+
+    private void bt_finActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_finActionPerformed
+        cont.dernier();
+        this.afficher();
+    }//GEN-LAST:event_bt_finActionPerformed
+
+    private void bt_supprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_supprimerActionPerformed
         // TODO add your handling code here:
-        
-    }   
+    }//GEN-LAST:event_bt_supprimerActionPerformed
+   
     /**
      * @param args the command line arguments
      */

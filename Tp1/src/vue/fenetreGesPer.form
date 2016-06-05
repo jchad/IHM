@@ -292,6 +292,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Employ&#xe9;"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rb_employeActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_commercial">
           <Properties>
@@ -300,6 +303,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Commercial"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rb_commercialActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_directeur">
           <Properties>
@@ -308,6 +314,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Directeur"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rb_directeurActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -510,11 +519,17 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Supprimer"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_supprimerActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_creer">
           <Properties>
             <Property name="text" type="java.lang.String" value="Creer"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_creerActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="l_nb">
           <Properties>
@@ -581,16 +596,25 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="D&#xe9;but"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_debutActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_prec">
           <Properties>
             <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_precActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_fin">
           <Properties>
             <Property name="text" type="java.lang.String" value="Fin"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_finActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_suiv">
           <Properties>
