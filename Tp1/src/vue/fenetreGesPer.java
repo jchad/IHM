@@ -3,16 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Personnel;
+package vue;
+import conteneurGenerique.*;
+import Personnel.*;
 import java.awt.*;
+import java.text.*;
+import javax.swing.*;
+
 /**
  *
  * @author Jordan
  */
-public class Fenetre extends javax.swing.JFrame {
+public class fenetreGesPer extends javax.swing.JFrame {
 
     /**
-     * Creates new form Fenetre
+     * Creates new form fenetreGesPer
      */
     private Conteneur<String,Personnel> cont;
     private int total;
@@ -21,14 +26,16 @@ public class Fenetre extends javax.swing.JFrame {
     private enum ModeCourant{AFFICHAGE,SAISIE, RECHERCHE};
     private ModeCourant modeCourant;
     
-    public Fenetre() {
+    public fenetreGesPer() {
         initComponents();
         typePersonnel = TypePersonnel.EMPLOYE;
         cont= new Conteneur<String, Personnel>();
         total=0;
+        this.modeAffichage();
+        this.afficher();
     }
     
-    private void modeaffichage(){
+    private void modeAffichage(){
         modeCourant= ModeCourant.AFFICHAGE;
         l_mode.setText("MODE AFFICHAGE");
         bt_lancer.setVisible(false);
@@ -90,6 +97,9 @@ public class Fenetre extends javax.swing.JFrame {
         bt_chercher.setEnabled(false);
         bt_supprimer.setEnabled(false);
         bt_debut.setEnabled(false);
+        bt_fin.setEnabled(false);
+        bt_prec.setEnabled(false);
+        bt_suiv.setEnabled(false);
         
     }
     private void effacer(){
@@ -102,6 +112,56 @@ public class Fenetre extends javax.swing.JFrame {
         tf_taux.setText("");
         tf_tel.setText("");
         tf_ventes.setText("");
+    }
+    private  void afficher(){
+        this.effacer();
+        l_nbElem.setText(Integer.toString(total));
+        if (total!=0){
+            Personnel pers = cont.obtenir(cont.cleCourante());
+            tf_mat.setText(pers.getNumPerson());
+            tf_nom.setText(pers.getNomPers());
+            tf_tel.setText(pers.getNumTel());
+            if (pers instanceof Employe){
+                tf_nbh.setText(Float.toString(((Employe)pers).getNbHeures()));
+                tf_taux.setText(Float.toString(((Employe)pers).getTauxHorraire()));
+                tf_mb.setText(nf.format(pers.calculPaie()));
+            }
+            if (pers instanceof Commercial){
+                tf_nbh.setText(Float.toString(((Commercial)pers).getNbHeures()));
+                tf_taux.setText(Float.toString(((Commercial)pers).getTauxHorraire()));
+                tf_ventes.setText(Float.toString(((Commercial)pers).getTotalVentes()));
+                tf_pour.setText(Float.toString(((Commercial)pers).getPourcentage()));
+                tf_mb.setText(nf.format(pers.calculPaie()));
+            }
+            if (pers instanceof Directeur){
+                tf_indem.setText(Float.toString(((Directeur)pers).getIndemnités()));
+                tf_mb.setText(nf.format(pers.calculPaie()));
+            }
+        }
+    }
+     private void saisir(){
+            tf_nom.setEnabled(true);
+            tf_tel.setEnabled(true);
+            if (typePersonnel == TypePersonnel.EMPLOYE) {
+                tf_taux.setEnabled(true);
+                tf_nbh.setEnabled(true);
+            } else if (typePersonnel == TypePersonnel.COMMERCIAL) {
+                tf_pour.setEnabled(true);
+                tf_ventes.setEnabled(true);
+                tf_taux.setEnabled(true);
+                tf_nbh.setEnabled(true);
+            } else if (typePersonnel == TypePersonnel.DIRECTEUR) {
+                tf_indem.setEnabled(true);
+            }
+        }
+    private void rechercher(){
+        if (cont.existe(tf_mat.getText())){
+            cont.positionner(tf_mat.getText());
+            this.afficher();
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "Matricule inexistant", "Ok", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     /**
@@ -153,6 +213,8 @@ public class Fenetre extends javax.swing.JFrame {
         bt_fin = new javax.swing.JButton();
         bt_suiv = new javax.swing.JButton();
         l_mode = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         m_menubar = new javax.swing.JMenuBar();
         m_menufile = new javax.swing.JMenu();
         mi_new = new javax.swing.JMenuItem();
@@ -271,6 +333,12 @@ public class Fenetre extends javax.swing.JFrame {
         l_pour.setText("Pourcentage");
 
         l_mb.setText("Montant Brut");
+
+        tf_mb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tf_mbActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout p_calculremLayout = new javax.swing.GroupLayout(p_calculrem);
         p_calculrem.setLayout(p_calculremLayout);
@@ -437,6 +505,10 @@ public class Fenetre extends javax.swing.JFrame {
 
         l_mode.setText(" ");
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo1.gif"))); // NOI18N
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo2.gif"))); // NOI18N
+
         m_menufile.setText("File");
 
         mi_new.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
@@ -491,10 +563,14 @@ public class Fenetre extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(l_img1)
-                        .addGap(47, 47, 47)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(l_mode)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(l_img2))
+                        .addComponent(l_img2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2))
                     .addComponent(p_infogen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(p_typeemp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(p_calculrem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -512,8 +588,10 @@ public class Fenetre extends javax.swing.JFrame {
                         .addGap(10, 10, 10)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(l_mode)
-                            .addComponent(l_img2))))
-                .addGap(18, 18, 18)
+                            .addComponent(l_img2)))
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(p_infogen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(p_typeemp, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -523,7 +601,7 @@ public class Fenetre extends javax.swing.JFrame {
                 .addComponent(p_gestcont, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(p_nav, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
 
         pack();
@@ -562,9 +640,13 @@ public class Fenetre extends javax.swing.JFrame {
     private void bt_lancerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_lancerActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_bt_lancerActionPerformed
+
+    private void tf_mbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_mbActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tf_mbActionPerformed
     private void bt_creerActionPerformed(java.awt.event.ActionEvent evt) {                                            
         // TODO add your handling code here:
-        if (bt)
+        
     }   
     /**
      * @param args the command line arguments
@@ -583,20 +665,21 @@ public class Fenetre extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Fenetre.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(fenetreGesPer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Fenetre.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(fenetreGesPer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Fenetre.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(fenetreGesPer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Fenetre.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(fenetreGesPer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Fenetre().setVisible(true);
+                new fenetreGesPer().setVisible(true);
             }
         });
     }
@@ -611,6 +694,8 @@ public class Fenetre extends javax.swing.JFrame {
     private javax.swing.JButton bt_prec;
     private javax.swing.JButton bt_suiv;
     private javax.swing.JButton bt_supprimer;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel l_img1;
     private javax.swing.JLabel l_img2;
     private javax.swing.JLabel l_indem;
