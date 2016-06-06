@@ -4,10 +4,13 @@
  * and open the template in the editor.
  */
 package vue;
-import conteneurGenerique.*;
+
 import Personnel.*;
+import conteneurGenerique.Conteneur;
 import java.awt.*;
-import java.text.*;
+import java.io.*;
+import java.awt.event.*;
+import java.io.File;
 import javax.swing.*;
 
 /**
@@ -25,14 +28,18 @@ public class fenetreGesPer extends javax.swing.JFrame {
     private TypePersonnel typePersonnel;
     private enum ModeCourant{AFFICHAGE,SAISIE, RECHERCHE};
     private ModeCourant modeCourant;
+    private JTextArea ta_fc;
+    private JFileChooser fc;
     
     public fenetreGesPer() {
         initComponents();
-        typePersonnel = TypePersonnel.EMPLOYE;
+        
         cont= new Conteneur<String, Personnel>();
         total=0;
         this.modeAffichage();
         this.afficher();
+        ta_fc = new JTextArea();
+        fc = new JFileChooser();
     }
     
     private void modeAffichage(){
@@ -40,7 +47,6 @@ public class fenetreGesPer extends javax.swing.JFrame {
         l_mode.setText("MODE AFFICHAGE");
         bt_lancer.setVisible(false);
         tf_mat.setEnabled(false);
-        tf_mat.setBackground(Color.CYAN);
         tf_indem.setEnabled(false);
         tf_mb.setEnabled(false);
         tf_nbh.setEnabled(false);
@@ -52,7 +58,12 @@ public class fenetreGesPer extends javax.swing.JFrame {
         rb_commercial.setEnabled(false);
         rb_directeur.setEnabled(false);
         rb_employe.setEnabled(false);
-        bt_chercher.setVisible(false);    
+        l_nbElem.setText(Integer.toString(total));
+        bt_rechercher.setVisible(false);
+        bt_confirmer.setVisible(false);
+        bt_chercher.setVisible(true);
+        bt_creer.setVisible(true);
+        bt_supprimer.setVisible(true);
         }
     
     private void modeRecherche(){
@@ -62,6 +73,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
         bt_creer.setVisible(false);
         bt_supprimer.setVisible(false);
         this.effacer();
+        bt_creer.setText("Créer");
         tf_mat.setEnabled(true);
         tf_mat.setEditable(true);
         if (!tf_mat.isFocusable())
@@ -79,6 +91,8 @@ public class fenetreGesPer extends javax.swing.JFrame {
         rb_directeur.setEnabled(false);
         rb_employe.setEnabled(false);
         bt_lancer.setVisible(false);
+        bt_rechercher.setVisible(false);
+        bt_confirmer.setVisible(false);
     }
     
     private void modeSaisie(){
@@ -100,6 +114,9 @@ public class fenetreGesPer extends javax.swing.JFrame {
         bt_fin.setEnabled(false);
         bt_prec.setEnabled(false);
         bt_suiv.setEnabled(false);
+        tf_nom.setEnabled(true);
+        tf_tel.setEnabled(true);
+        bt_creer.setEnabled(true);
         
     }
     private void effacer(){
@@ -114,10 +131,9 @@ public class fenetreGesPer extends javax.swing.JFrame {
         tf_ventes.setText("");
     }
     private  void afficher(){
-        this.modeAffichage();
         this.effacer();
         l_nbElem.setText(Integer.toString(total));
-        if (total!=0){
+        if (cont.estVide()== false){
             Personnel pers = cont.obtenir(cont.cleCourante());
             tf_mat.setText(pers.getNumPerson());
             tf_nom.setText(pers.getNomPers());
@@ -125,35 +141,45 @@ public class fenetreGesPer extends javax.swing.JFrame {
             if (pers instanceof Employe){
                 tf_nbh.setText(Float.toString(((Employe)pers).getNbHeures()));
                 tf_taux.setText(Float.toString(((Employe)pers).getTauxHorraire()));
-                tf_mb.setText(nf.format(pers.calculPaie()));
+                tf_mb.setText(Float.toString(((Employe)pers).calculPaie()));
             }
             if (pers instanceof Commercial){
                 tf_nbh.setText(Float.toString(((Commercial)pers).getNbHeures()));
                 tf_taux.setText(Float.toString(((Commercial)pers).getTauxHorraire()));
                 tf_ventes.setText(Float.toString(((Commercial)pers).getTotalVentes()));
                 tf_pour.setText(Float.toString(((Commercial)pers).getPourcentage()));
-                tf_mb.setText(nf.format(pers.calculPaie()));
+                tf_mb.setText(Float.toString(((Commercial)pers).calculPaie()));
             }
             if (pers instanceof Directeur){
                 tf_indem.setText(Float.toString(((Directeur)pers).getIndemnités()));
-                tf_mb.setText(nf.format(pers.calculPaie()));
+                tf_mb.setText(Float.toString(((Directeur)pers).calculPaie()));
             }
         }
     }
      private void saisir(){
-            this.modeSaisie();
-            tf_nom.setEnabled(true);
-            tf_tel.setEnabled(true);
+            bt_rechercher.setVisible(false);
+            bt_confirmer.setVisible(false);
             if (typePersonnel == TypePersonnel.EMPLOYE) {
+                tf_pour.setEnabled(false);
+                tf_ventes.setEnabled(false);
                 tf_taux.setEnabled(true);
                 tf_nbh.setEnabled(true);
+                tf_indem.setEnabled(false);
+                tf_mb.setEnabled(false);
             } else if (typePersonnel == TypePersonnel.COMMERCIAL) {
                 tf_pour.setEnabled(true);
                 tf_ventes.setEnabled(true);
                 tf_taux.setEnabled(true);
                 tf_nbh.setEnabled(true);
+                tf_indem.setEnabled(false);
+                tf_mb.setEnabled(false);
             } else if (typePersonnel == TypePersonnel.DIRECTEUR) {
+                tf_pour.setEnabled(false);
+                tf_ventes.setEnabled(false);
+                tf_taux.setEnabled(false);
+                tf_nbh.setEnabled(false);
                 tf_indem.setEnabled(true);
+                tf_mb.setEnabled(false);
             }
         }
     private void rechercher(){
@@ -163,17 +189,19 @@ public class fenetreGesPer extends javax.swing.JFrame {
             this.afficher();
         }
         else{
-            JOptionPane.showMessageDialog(null, "Matricule inexistant", "Ok", JOptionPane.ERROR_MESSAGE);
+            JOptionPane jp1;
+            jp1 = new JOptionPane();
+            jp1.showMessageDialog(null, "Matricule inexistant", "Ok", JOptionPane.ERROR_MESSAGE);
         }
     }
     private void ajouter(){
         String nom = tf_nom.getText();
         String tel = tf_tel.getText();
-        float txh = this.parseFloat(tf_taux.getText());
-        float nbh = this.parseFloat(tf_nbh.getText());
-        float indem = this.parseFloat(tf_indem.getText());
-        float pour = this.parseFloat(tf_pour.getText());
-        float ventes = this.parseFloat(tf_ventes.getText());
+        float txh = Float.parseFloat(tf_taux.getText());
+        float nbh = Float.parseFloat(tf_nbh.getText());
+        float indem = Float.parseFloat(tf_indem.getText());
+        float pour = Float.parseFloat(tf_pour.getText());
+        float ventes = Float.parseFloat(tf_ventes.getText());
         if (typePersonnel == TypePersonnel.EMPLOYE){
             Employe emp = new Employe(nom, tel, txh, nbh);
             cont.ajouter(emp.getNumPerson(), emp);
@@ -184,7 +212,18 @@ public class fenetreGesPer extends javax.swing.JFrame {
             Directeur dir = new Directeur(nom, tel, indem);
             cont.ajouter(dir.getNumPerson(),dir);            
         }
+        total++;
     }
+    private void supprimer(){
+        if(cont.existe(tf_mat.getText())){
+            cont.supprimer(tf_mat.getText());
+            total++;
+        }else{
+            JOptionPane jp1;
+            jp1 = new JOptionPane() ;
+            jp1.showMessageDialog(null,"Matricule non existant"," Erreur",JOptionPane.WARNING_MESSAGE);
+            }   
+    } 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -203,6 +242,8 @@ public class fenetreGesPer extends javax.swing.JFrame {
         tf_tel = new javax.swing.JTextField();
         tf_nom = new javax.swing.JTextField();
         tf_mat = new javax.swing.JTextField();
+        bt_rechercher = new javax.swing.JButton();
+        bt_confirmer = new javax.swing.JButton();
         l_img2 = new javax.swing.JLabel();
         p_typeemp = new javax.swing.JPanel();
         rb_employe = new javax.swing.JRadioButton();
@@ -234,13 +275,12 @@ public class fenetreGesPer extends javax.swing.JFrame {
         bt_fin = new javax.swing.JButton();
         bt_suiv = new javax.swing.JButton();
         l_mode = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         m_menubar = new javax.swing.JMenuBar();
         m_menufile = new javax.swing.JMenu();
         mi_new = new javax.swing.JMenuItem();
         mi_load = new javax.swing.JMenuItem();
         mi_save = new javax.swing.JMenuItem();
+        mi_quit = new javax.swing.JMenuItem();
         m_menuhelp = new javax.swing.JMenu();
         mi_about = new javax.swing.JMenuItem();
 
@@ -266,7 +306,21 @@ public class fenetreGesPer extends javax.swing.JFrame {
             }
         });
 
-        tf_mat.setToolTipText("Bonjour tu veux des cookies?");
+        tf_mat.setToolTipText("");
+
+        bt_rechercher.setText("RECHERCHER");
+        bt_rechercher.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_rechercherActionPerformed(evt);
+            }
+        });
+
+        bt_confirmer.setText("CONFIRMER");
+        bt_confirmer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_confirmerActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout p_infogenLayout = new javax.swing.GroupLayout(p_infogen);
         p_infogen.setLayout(p_infogenLayout);
@@ -280,7 +334,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
                 .addGroup(p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(p_infogenLayout.createSequentialGroup()
                         .addComponent(tf_tel, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 222, Short.MAX_VALUE)
                         .addComponent(l_mat)
                         .addGap(18, 18, 18)
                         .addComponent(tf_mat, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -288,6 +342,12 @@ public class fenetreGesPer extends javax.swing.JFrame {
                     .addGroup(p_infogenLayout.createSequentialGroup()
                         .addComponent(tf_nom)
                         .addContainerGap())))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, p_infogenLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(bt_rechercher)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(bt_confirmer)
+                .addGap(42, 42, 42))
         );
         p_infogenLayout.setVerticalGroup(
             p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -301,6 +361,10 @@ public class fenetreGesPer extends javax.swing.JFrame {
                     .addComponent(l_tel)
                     .addComponent(tf_tel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tf_mat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(p_infogenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bt_rechercher)
+                    .addComponent(bt_confirmer))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -566,10 +630,6 @@ public class fenetreGesPer extends javax.swing.JFrame {
 
         l_mode.setText(" ");
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo1.gif"))); // NOI18N
-
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo2.gif"))); // NOI18N
-
         m_menufile.setText("File");
 
         mi_new.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
@@ -599,6 +659,15 @@ public class fenetreGesPer extends javax.swing.JFrame {
         });
         m_menufile.add(mi_save);
 
+        mi_quit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+        mi_quit.setText("Quitter");
+        mi_quit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mi_quitActionPerformed(evt);
+            }
+        });
+        m_menufile.add(mi_quit);
+
         m_menubar.add(m_menufile);
 
         m_menuhelp.setText("?");
@@ -624,14 +693,11 @@ public class fenetreGesPer extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(l_img1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(126, 126, 126)
                         .addComponent(l_mode)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(l_img2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2))
+                        .addGap(206, 206, 206))
                     .addComponent(p_infogen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(p_typeemp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(p_calculrem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -649,10 +715,8 @@ public class fenetreGesPer extends javax.swing.JFrame {
                         .addGap(10, 10, 10)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(l_mode)
-                            .addComponent(l_img2)))
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(l_img2))))
+                .addGap(55, 55, 55)
                 .addComponent(p_infogen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(p_typeemp, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -662,26 +726,28 @@ public class fenetreGesPer extends javax.swing.JFrame {
                 .addComponent(p_gestcont, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(p_nav, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_newActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newActionPerformed
-        // TODO add your handling code here:
+        mi_new.addActionListener(new EcouteurMenu());
     }//GEN-LAST:event_mi_newActionPerformed
 
     private void mi_loadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_loadActionPerformed
-        // TODO add your handling code here:
+        mi_load.addActionListener(new EcouteurMenu());
     }//GEN-LAST:event_mi_loadActionPerformed
 
     private void mi_saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_saveActionPerformed
-        // TODO add your handling code here:
+        mi_save.addActionListener(new EcouteurMenu());
     }//GEN-LAST:event_mi_saveActionPerformed
 
     private void mi_aboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_aboutActionPerformed
-        // TODO add your handling code here:
+        JOptionPane jp1;
+        jp1 = new JOptionPane() ;
+        jp1.showMessageDialog(null,"Ce programme a été fait par Jordan CHADUIRON.","Information",JOptionPane.INFORMATION_MESSAGE);  
     }//GEN-LAST:event_mi_aboutActionPerformed
 
     private void tf_telActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_telActionPerformed
@@ -689,12 +755,23 @@ public class fenetreGesPer extends javax.swing.JFrame {
     }//GEN-LAST:event_tf_telActionPerformed
 
     private void bt_suivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_suivActionPerformed
-        cont.suivant();
-        this.afficher();
+        if(cont.cleSuivante()!= null){
+            cont.suivant();
+            this.afficher();
+         
+        }else{
+            JOptionPane jp1;
+            jp1 = new JOptionPane();
+            jp1.showMessageDialog(null,"Pas  de personne suivante dans le conteneur","Erreur",JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_bt_suivActionPerformed
 
     private void bt_chercherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_chercherActionPerformed
-        this.rechercher();
+        bt_confirmer.setVisible(false);
+        if(bt_chercher.getText().compareTo("Chercher")== 0){
+            this.modeRecherche();
+            bt_rechercher.setVisible(true);
+        }
     }//GEN-LAST:event_bt_chercherActionPerformed
 
     private void bt_lancerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_lancerActionPerformed
@@ -709,7 +786,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
                 /* on peut arriver a ce bouton pour 2 raisons : pour creer un
         nouveau Personnel ou pour valider une saisie de Personnel en
         l'ajoutant au conteneur : */
-        if (bt_creer.getText().compareTo("AJOUTER") == 0) {
+        if (bt_creer.getText().compareTo("Ajouter") == 0) {
             /* on aurait pu faire un test sur modeCourant... si on a
            AJOUTER, on est en mode SAISIE : il faut ajouter le Personnel au
            conteneur */
@@ -718,6 +795,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
             this.modeAffichage(); /* on bascule en mode Affichage
            apres chaque saisie */
             this.afficher();
+            bt_creer.setText("Creer");
         } else { /* bouton CREER : on est en mode AFFICHAGE et on veut
             passer en mode Saisie */
             this.effacer(); /* au cas ou il y a eu une saisie
@@ -729,37 +807,71 @@ public class fenetreGesPer extends javax.swing.JFrame {
 
     private void rb_employeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_employeActionPerformed
         typePersonnel = TypePersonnel.EMPLOYE;
+        effacer();
         saisir();
     }//GEN-LAST:event_rb_employeActionPerformed
 
     private void rb_commercialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_commercialActionPerformed
         typePersonnel = TypePersonnel.COMMERCIAL;
+        effacer();
         saisir();
     }//GEN-LAST:event_rb_commercialActionPerformed
 
     private void rb_directeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_directeurActionPerformed
         typePersonnel = TypePersonnel.DIRECTEUR;
+        effacer();
         saisir();
     }//GEN-LAST:event_rb_directeurActionPerformed
 
     private void bt_debutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_debutActionPerformed
+        if(cont.estVide()== false){
         cont.premier();
         this.afficher();
+        }
     }//GEN-LAST:event_bt_debutActionPerformed
 
     private void bt_precActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_precActionPerformed
-        cont.precedent();
-        this.afficher();
+        if(cont.clePrecedente()!= null){
+            cont.precedent();
+            this.afficher();
+         
+        }else{
+            JOptionPane jp1;
+            jp1 = new JOptionPane();
+            jp1.showMessageDialog(null,"Pas de personne precedente dans le conteneur","Erreur",JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_bt_precActionPerformed
 
     private void bt_finActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_finActionPerformed
-        cont.dernier();
+        if(cont.estVide() == false){
+            cont.dernier();
+        
         this.afficher();
+        }
     }//GEN-LAST:event_bt_finActionPerformed
 
     private void bt_supprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_supprimerActionPerformed
-        // TODO add your handling code here:
+        bt_rechercher.setVisible(false);
+        if (bt_supprimer.getText().compareTo("Supprimer") == 0) {
+            this.modeRecherche();
+            bt_confirmer.setVisible(true);
+        }
     }//GEN-LAST:event_bt_supprimerActionPerformed
+
+    private void bt_rechercherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_rechercherActionPerformed
+        this.rechercher();
+        this.modeAffichage();
+        this.afficher();
+    }//GEN-LAST:event_bt_rechercherActionPerformed
+
+    private void bt_confirmerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_confirmerActionPerformed
+        this.supprimer();
+        this.modeAffichage();
+    }//GEN-LAST:event_bt_confirmerActionPerformed
+
+    private void mi_quitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_quitActionPerformed
+        mi_quit.addActionListener(new EcouteurMenu());
+    }//GEN-LAST:event_mi_quitActionPerformed
    
     /**
      * @param args the command line arguments
@@ -796,19 +908,65 @@ public class fenetreGesPer extends javax.swing.JFrame {
             }
         });
     }
+        class EcouteurMenu implements ActionListener {
+        private int choix;
+        private JFileChooser d;
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == mi_new) {
+                cont.vider();
+                total =0;
+                Personnel.resetDernierAttribue();
+                effacer();
+                l_nbElem.setText(Integer.toString(total));
+            } else if (e.getSource() == mi_load) {
+            
+            int returnVal = fc.showOpenDialog(null);
+            
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+            } 
+            ta_fc.setCaretPosition(ta_fc.getDocument().getLength());
+            
+            
+            
+            //SAUVEGARDER ----------
+            }//SAUVEGARDER ----------
+            else if (e.getSource() == mi_save){
+                
+                fc = new JFileChooser(new File("."));
+                fc.setDialogTitle("Sauvegarder ...");
+                fc.setFileFilter(null);
+                choix=fc.showOpenDialog((Component)e.getSource());
+                
+                if(choix == JFileChooser.APPROVE_OPTION) {
+                   
+                    File f= fc.getSelectedFile();
+                    cont.sauvegarder(f.getAbsolutePath());
+                }
+                    
+                    
+            }else if (e.getSource() == mi_quit){
+                System.exit(0);
+            }
+    
+            
+        }
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup TypesEmployés;
     private javax.swing.JButton bt_chercher;
+    private javax.swing.JButton bt_confirmer;
     private javax.swing.JButton bt_creer;
     private javax.swing.JButton bt_debut;
     private javax.swing.JButton bt_fin;
     private javax.swing.JButton bt_lancer;
     private javax.swing.JButton bt_prec;
+    private javax.swing.JButton bt_rechercher;
     private javax.swing.JButton bt_suiv;
     private javax.swing.JButton bt_supprimer;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel l_img1;
     private javax.swing.JLabel l_img2;
     private javax.swing.JLabel l_indem;
@@ -829,6 +987,7 @@ public class fenetreGesPer extends javax.swing.JFrame {
     private javax.swing.JMenuItem mi_about;
     private javax.swing.JMenuItem mi_load;
     private javax.swing.JMenuItem mi_new;
+    private javax.swing.JMenuItem mi_quit;
     private javax.swing.JMenuItem mi_save;
     private javax.swing.JPanel p_calculrem;
     private javax.swing.JPanel p_gestcont;
