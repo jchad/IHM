@@ -45,8 +45,7 @@ public class FenetreConteneur extends javax.swing.JFrame {
     private ModeCourant modeCourant;
 
     /** Contructeur par defaut ou l'on cree un nouveau conteneur */
-    public FenetreConteneur() throws SQLException, IOException {
-        this.inst = null;
+    public FenetreConteneur() throws SQLException, IOException{
 
         initComponents();
 
