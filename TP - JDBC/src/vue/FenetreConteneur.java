@@ -46,6 +46,7 @@ public class FenetreConteneur extends javax.swing.JFrame {
 
     /** Contructeur par defaut ou l'on cree un nouveau conteneur */
     public FenetreConteneur() throws SQLException, IOException {
+        this.inst = null;
 
         initComponents();
 
@@ -627,9 +628,7 @@ public class FenetreConteneur extends javax.swing.JFrame {
                 } catch (SQLException ex) {
                     showMessageDialog(this,"Problème de suppression de la base de données","Erreur",ERROR_MESSAGE);
                     Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-              Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
-          }
+                }
           cont.supprimer(cont.cleCourante());
           afficher();
       } else {

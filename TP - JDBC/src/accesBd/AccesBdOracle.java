@@ -8,9 +8,10 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.*;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
 import personnel.*;
+import oracle.jdbc.*;
+import static oracle.jdbc.OracleTypes.*;
+import oracle.jdbc.pool.OracleDataSource;
 
 /**
  *
@@ -18,19 +19,24 @@ import personnel.*;
  */
 public class AccesBdOracle {
     private static AccesBdOracle instance = null;
-    private static Statement stmt = null;
-    private static Connection connec = null;
-    private static ResultSet rs = null;
+    private static Statement stmt;
+    private static Connection connec;
+    private static ResultSet rs;
     
-    private AccesBdOracle() throws SQLException, IOException{
-        connec=creerConnexion();
+    private AccesBdOracle(){};
+    
+        public static AccesBdOracle getInstance() throws SQLException, IOException{
+        if(instance == null){
+            instance = new AccesBdOracle();
+        }
+        return instance;
     }
-    
-    public static Connection creerConnexion() throws SQLException, FileNotFoundException, IOException {
+        
+    public static Connection creerConnexion() throws SQLException{
         Properties props = new Properties();
         FileInputStream fichier = null;
         try {
-            fichier = new FileInputStream("src/accesBd /connexionOracle.properties");
+            fichier = new FileInputStream("src/accesBd/connexionOracle.properties");
             props.load(fichier);
         }
         catch (FileNotFoundException e) {
@@ -48,7 +54,7 @@ public class AccesBdOracle {
             OracleDataSource ods = new OracleDataSource();
             ods.setDriverType(props.getProperty("pilote"));
             ods.setPortNumber(new Integer(props.getProperty("port")).intValue());
-            ods.setDatabaseName(props.getProperty("service"));
+            ods.setServiceName(props.getProperty("service"));
             ods.setUser(props.getProperty("user"));
             ods.setPassword(props.getProperty("pwd"));
             ods.setServerName(props.getProperty("serveur"));
@@ -66,7 +72,7 @@ public class AccesBdOracle {
         System.out.println("deconnection ok");
     }
     
-    public void charger(TreeMap<String, Personnel> tMap) throws SQLException, IOException {
+    public void charger(TreeMap<String, Personnel> tMap) throws SQLException{
         connec = creerConnexion();
         
         String query = "SELECT numpers, nompers, numtel, tauxhorraire, nbheures, indemnite, prime, pourcentage, ventes, typepersonnel FROM personnel order by numpers";
@@ -92,7 +98,7 @@ public class AccesBdOracle {
         instance.fermer();
     }
     
-    public void supprimer(String mat) throws SQLException, IOException{
+    public void supprimer(String mat) throws SQLException{
         connec = creerConnexion();
         PreparedStatement query = connec.prepareStatement("Delete from personnel where numpers = ?");
         query.setString(1,mat);
@@ -100,7 +106,7 @@ public class AccesBdOracle {
         instance.fermer();
     }
     
-    public void inserer(Personnel pers) throws SQLException, IOException{
+    public void inserer(Personnel pers) throws SQLException{
         connec = creerConnexion();
         PreparedStatement pstmt = connec.prepareStatement("Insert into Personnel values(?,?,?,?,?,?,?,?,?,?");
         pstmt.setString(1, pers.getNumPers());
@@ -136,16 +142,6 @@ public class AccesBdOracle {
         }
         pstmt.executeUpdate();
         instance.fermer();
-    }
-    
-    public static AccesBdOracle getInstance() throws SQLException, IOException{
-        if(instance != null){
-            return instance;
-        }else{
-            AccesBdOracle inst = new AccesBdOracle();
-            return inst;
-        }
-    }
-    
+    }  
  }
 
