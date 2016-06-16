@@ -48,7 +48,7 @@ public class AccesBdOracle {
             OracleDataSource ods = new OracleDataSource();
             ods.setDriverType(props.getProperty("pilote"));
             ods.setPortNumber(new Integer(props.getProperty("port")).intValue());
-            ods.setServiceName(props.getProperty("service"));
+            ods.setDatabaseName(props.getProperty("service"));
             ods.setUser(props.getProperty("user"));
             ods.setPassword(props.getProperty("pwd"));
             ods.setServerName(props.getProperty("serveur"));
@@ -66,7 +66,9 @@ public class AccesBdOracle {
         System.out.println("deconnection ok");
     }
     
-    public void charger(TreeMap<String, Personnel> tMap) throws SQLException {
+    public void charger(TreeMap<String, Personnel> tMap) throws SQLException, IOException {
+        connec = creerConnexion();
+        
         String query = "SELECT numpers, nompers, numtel, tauxhorraire, nbheures, indemnite, prime, pourcentage, ventes, typepersonnel FROM personnel order by numpers";
         Personnel elt = null;
         stmt = connec.createStatement();
@@ -86,16 +88,20 @@ public class AccesBdOracle {
                     break;
             }
         tMap.put(cle, elt);
-        }   
+        }
+        instance.fermer();
     }
     
-    public void supprimer(TreeMap<String, Personnel> tMap, String mat) throws SQLException{
+    public void supprimer(String mat) throws SQLException, IOException{
+        connec = creerConnexion();
         PreparedStatement query = connec.prepareStatement("Delete from personnel where numpers = ?");
         query.setString(1,mat);
         query.executeUpdate();
+        instance.fermer();
     }
     
-    public void inserer(TreeMap<String, Personnel> tMap, Personnel pers) throws SQLException{
+    public void inserer(Personnel pers) throws SQLException, IOException{
+        connec = creerConnexion();
         PreparedStatement pstmt = connec.prepareStatement("Insert into Personnel values(?,?,?,?,?,?,?,?,?,?");
         pstmt.setString(1, pers.getNumPers());
         pstmt.setString(2, pers.getNomPers());
@@ -128,6 +134,8 @@ public class AccesBdOracle {
             pstmt.setNull(9, java.sql.Types.FLOAT);
             pstmt.setString(10, "Directeur");
         }
+        pstmt.executeUpdate();
+        instance.fermer();
     }
     
     public static AccesBdOracle getInstance() throws SQLException, IOException{
