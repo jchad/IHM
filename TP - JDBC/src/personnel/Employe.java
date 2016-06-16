@@ -27,7 +27,12 @@ public class Employe extends Personnel {
         tauxHoraire=valTaux;
         nbHeures=heures;
     }
-
+    public Employe(String mat, String nom, String tel, float txHoraire, float nbH)
+    {
+        super(mat, nom, tel);
+        this.tauxHoraire = txHoraire;
+        this.nbHeures = nbH;
+    }
     // calcul de la paie de l'employe
     @Override
     public float calculPaie(){ return tauxHoraire * nbHeures;}

@@ -33,6 +33,12 @@ public abstract class Personnel implements Comparable<Personnel>, Serializable {
         numTel  = numero;
     }
 
+    public Personnel(String mat, String nom, String tel){
+        this.nomPers = nom;
+        this.numTel = tel;
+        this.numPers = mat;
+        dernierAttribue = Integer.parseInt(mat.replace("M", ""));
+    }
     // methode d'instance
     // pour affecter le plus grand matricule au champ statique 'dernierAttribue'
     // appelle setDernierAttribue()

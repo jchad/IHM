@@ -85,13 +85,13 @@ public class AccesBdOracle {
             String cat = rs.getString(10);
             switch (cat) {
                 case "Employe":
-                    elt = new Employe(rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5));
+                    elt = new Employe(cle, rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5));
                     break;
                 case "Commercial":
-                    elt = new Commercial(rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5), rs.getFloat(8), rs.getFloat(9));
+                    elt = new Commercial(cle, rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5), rs.getFloat(8), rs.getFloat(9));
                     break;
                 case "Directeur":
-                    elt = new Directeur(rs.getString(2), rs.getString(3), rs.getFloat(6), rs.getFloat(7));
+                    elt = new Directeur(cle, rs.getString(2), rs.getString(3), rs.getFloat(6), rs.getFloat(7));
                     break;
             }
         tMap.put(cle, elt);

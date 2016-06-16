@@ -25,6 +25,11 @@ public final class Directeur extends Personnel {
         indemnite=valIndemnite;
         prime=valPrime;
     }
+    public Directeur(String mat, String nom, String tel, float indemn, float valprime){
+        super(mat, nom,tel);
+        this.indemnite = indemn;
+        prime=valprime;
+    }
     /** calcul de la paie du Directeur */
     public float calculPaie() {
         return indemnite + prime;

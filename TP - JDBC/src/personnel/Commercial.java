@@ -32,7 +32,11 @@ public final class Commercial extends Employe {
         pourcentage=valPourcent;
         ventes=valVentes;
     }
-
+    public Commercial(String mat, String nom, String tel, float txHoraire, float nbH, float pourcent, float totVentes){
+        super(mat, nom,tel,txHoraire,nbH);
+        this.pourcentage = pourcent;
+        this.ventes = totVentes;
+    }
 
     /** calcul de la paie du commercial*/
     public float calculPaie(){
