@@ -20,9 +20,9 @@ public class AccesBdOracle {
     private static AccesBdOracle instance = null;
     private static Statement stmt = null;
     private static Connection connec = null;
-    private static ResultatSet rs = null;
+    private static ResultSet rs = null;
     
-    private AccesBdOracle throws{
+    private AccesBdOracle() throws SQLException, IOException{
         connec=creerConnexion();
     }
     
@@ -76,13 +76,13 @@ public class AccesBdOracle {
             String cat = rs.getString(4);
             switch (cat) {
                 case "Employe":
-                    elt = new Employe(cle, rs.getString(2), rs.getString(3), rs.getFloat(5), rs.getFloat(6));
+                    elt = new Employe(rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5));
                     break;
                 case "Commercial":
-                    elt = new Commercial(cle, rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5), rs.getFloat(8), rs.getFloat(9));
+                    elt = new Commercial(rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5), rs.getFloat(8), rs.getFloat(9));
                     break;
                 case "Directeur":
-                    elt = new Directeur(cle, rs.getString(2), rs.getString(3), rs.getFloat(6), rs.getFloat(7));
+                    elt = new Directeur(rs.getString(2), rs.getString(3), rs.getFloat(6), rs.getFloat(7));
                     break;
             }
         tMap.put(cle, elt);
@@ -102,18 +102,41 @@ public class AccesBdOracle {
         pstmt.setString(3, pers.getNumTel());
         
         if (pers instanceof Employe){
-            
+            pstmt.setFloat(4, ((Employe) pers).getTaux());
+            pstmt.setFloat(5, ((Employe) pers).getNbHeures());
+            pstmt.setNull(6, java.sql.Types.FLOAT);
+            pstmt.setNull(7, java.sql.Types.FLOAT);
+            pstmt.setNull(8, java.sql.Types.FLOAT);
+            pstmt.setNull(9, java.sql.Types.FLOAT);
+            pstmt.setString(10, "Employe");
         }
-        if (pers instanceof Commercial){
-            
+        else if (pers instanceof Commercial){
+            pstmt.setFloat(4, ((Commercial) pers).getTaux());
+            pstmt.setFloat(5, ((Commercial) pers).getNbHeures());
+            pstmt.setNull(6, java.sql.Types.FLOAT);
+            pstmt.setNull(7, java.sql.Types.FLOAT);
+            pstmt.setFloat(8, ((Commercial) pers).getPourcentage());
+            pstmt.setFloat(9, ((Commercial) pers).getVentes());
+            pstmt.setString(10, "Commercial");
         }
-        if (pers instanceof Directeur){
-            
+        else if (pers instanceof Directeur){
+            pstmt.setNull(4, java.sql.Types.FLOAT);
+            pstmt.setNull(5, java.sql.Types.FLOAT);
+            pstmt.setFloat(6, ((Directeur) pers).getIndemnites());
+            pstmt.setFloat(7, ((Directeur) pers).getPrime());
+            pstmt.setNull(8, java.sql.Types.FLOAT);
+            pstmt.setNull(9, java.sql.Types.FLOAT);
+            pstmt.setString(10, "Directeur");
         }
     }
     
-    public static AccesBdOracle getInstance(){
-        return instance;
+    public static AccesBdOracle getInstance() throws SQLException, IOException{
+        if(instance != null){
+            return instance;
+        }else{
+            AccesBdOracle inst = new AccesBdOracle();
+            return inst;
+        }
     }
     
  }
