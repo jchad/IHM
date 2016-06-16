@@ -8,9 +8,10 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.*;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
 import personnel.*;
+import oracle.jdbc.*;
+import static oracle.jdbc.OracleTypes.*;
+import oracle.jdbc.pool.OracleDataSource;
 
 /**
  *
@@ -18,19 +19,24 @@ import personnel.*;
  */
 public class AccesBdOracle {
     private static AccesBdOracle instance = null;
-    private static Statement stmt = null;
-    private static Connection connec = null;
-    private static ResultSet rs = null;
+    private static Statement stmt;
+    private static Connection connec;
+    private static ResultSet rs;
     
-    private AccesBdOracle() throws SQLException, IOException{
-        connec=creerConnexion();
+    private AccesBdOracle(){};
+    
+        public static AccesBdOracle getInstance() throws SQLException, IOException{
+        if(instance == null){
+            instance = new AccesBdOracle();
+        }
+        return instance;
     }
-    
-    public static Connection creerConnexion() throws SQLException, FileNotFoundException, IOException {
+        
+    public static Connection creerConnexion() throws SQLException{
         Properties props = new Properties();
         FileInputStream fichier = null;
         try {
-            fichier = new FileInputStream("src/accesBd /connexionOracle.properties");
+            fichier = new FileInputStream("src/accesBd/connexionOracle.properties");
             props.load(fichier);
         }
         catch (FileNotFoundException e) {
@@ -48,7 +54,7 @@ public class AccesBdOracle {
             OracleDataSource ods = new OracleDataSource();
             ods.setDriverType(props.getProperty("pilote"));
             ods.setPortNumber(new Integer(props.getProperty("port")).intValue());
-            ods.setServiceName(props.getProperty("service"));
+            ods.setDatabaseName(props.getProperty("service"));
             ods.setUser(props.getProperty("user"));
             ods.setPassword(props.getProperty("pwd"));
             ods.setServerName(props.getProperty("serveur"));
@@ -66,14 +72,17 @@ public class AccesBdOracle {
         System.out.println("deconnection ok");
     }
     
-    public void charger(TreeMap<String, Personnel> tMap) throws SQLException {
+    public void charger(TreeMap<String, Personnel> tMap) throws SQLException{
+        connec = creerConnexion();
+        
         String query = "SELECT numpers, nompers, numtel, tauxhorraire, nbheures, indemnite, prime, pourcentage, ventes, typepersonnel FROM personnel order by numpers";
         Personnel elt = null;
+        if (connec == null)System.out.println("Pas de co");
         stmt = connec.createStatement();
         rs = stmt.executeQuery(query);
         while (rs.next()) {
             String cle = rs.getString(1);
-            String cat = rs.getString(4);
+            String cat = rs.getString(10);
             switch (cat) {
                 case "Employe":
                     elt = new Employe(rs.getString(2), rs.getString(3), rs.getFloat(4), rs.getFloat(5));
@@ -86,17 +95,21 @@ public class AccesBdOracle {
                     break;
             }
         tMap.put(cle, elt);
-        }   
+        }
+        instance.fermer();
     }
     
-    public void supprimer(TreeMap<String, Personnel> tMap, String mat) throws SQLException{
+    public void supprimer(String mat) throws SQLException{
+        connec = creerConnexion();
         PreparedStatement query = connec.prepareStatement("Delete from personnel where numpers = ?");
         query.setString(1,mat);
         query.executeUpdate();
+        instance.fermer();
     }
     
-    public void inserer(TreeMap<String, Personnel> tMap, Personnel pers) throws SQLException{
-        PreparedStatement pstmt = connec.prepareStatement("Insert into Personnel values(?,?,?,?,?,?,?,?,?,?");
+    public void inserer(Personnel pers) throws SQLException{
+        connec = creerConnexion();
+        PreparedStatement pstmt = connec.prepareStatement("Insert into Personnel values(?,?,?,?,?,?,?,?,?,?)");
         pstmt.setString(1, pers.getNumPers());
         pstmt.setString(2, pers.getNomPers());
         pstmt.setString(3, pers.getNumTel());
@@ -104,40 +117,32 @@ public class AccesBdOracle {
         if (pers instanceof Employe){
             pstmt.setFloat(4, ((Employe) pers).getTaux());
             pstmt.setFloat(5, ((Employe) pers).getNbHeures());
-            pstmt.setNull(6, java.sql.Types.FLOAT);
-            pstmt.setNull(7, java.sql.Types.FLOAT);
-            pstmt.setNull(8, java.sql.Types.FLOAT);
-            pstmt.setNull(9, java.sql.Types.FLOAT);
+            pstmt.setNull(6, FLOAT);
+            pstmt.setNull(7, FLOAT);
+            pstmt.setNull(8, FLOAT);
+            pstmt.setNull(9, FLOAT);
             pstmt.setString(10, "Employe");
         }
         else if (pers instanceof Commercial){
             pstmt.setFloat(4, ((Commercial) pers).getTaux());
             pstmt.setFloat(5, ((Commercial) pers).getNbHeures());
-            pstmt.setNull(6, java.sql.Types.FLOAT);
-            pstmt.setNull(7, java.sql.Types.FLOAT);
+            pstmt.setNull(6, FLOAT);
+            pstmt.setNull(7, FLOAT);
             pstmt.setFloat(8, ((Commercial) pers).getPourcentage());
             pstmt.setFloat(9, ((Commercial) pers).getVentes());
             pstmt.setString(10, "Commercial");
         }
         else if (pers instanceof Directeur){
-            pstmt.setNull(4, java.sql.Types.FLOAT);
-            pstmt.setNull(5, java.sql.Types.FLOAT);
+            pstmt.setNull(4, FLOAT);
+            pstmt.setNull(5, FLOAT);
             pstmt.setFloat(6, ((Directeur) pers).getIndemnites());
             pstmt.setFloat(7, ((Directeur) pers).getPrime());
-            pstmt.setNull(8, java.sql.Types.FLOAT);
-            pstmt.setNull(9, java.sql.Types.FLOAT);
+            pstmt.setNull(8, FLOAT);
+            pstmt.setNull(9, FLOAT);
             pstmt.setString(10, "Directeur");
         }
-    }
-    
-    public static AccesBdOracle getInstance() throws SQLException, IOException{
-        if(instance != null){
-            return instance;
-        }else{
-            AccesBdOracle inst = new AccesBdOracle();
-            return inst;
-        }
-    }
-    
+        pstmt.executeUpdate();
+        instance.fermer();
+    }  
  }
 

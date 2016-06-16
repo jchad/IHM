@@ -4,6 +4,7 @@
  */
 package vue;
 
+import accesBd.*;
 import conteneurGenerique.Conteneur;
 import personnel.Employe;
 import personnel.Directeur;
@@ -12,9 +13,16 @@ import personnel.Commercial;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File; // pour les fichiers
+import java.io.IOException;
+import java.sql.SQLException;
 import java.text.*; // pour DecimalFormat
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane; // pour les fenetres de dialogue
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.WindowConstants;
 
 /**
@@ -25,7 +33,7 @@ public class FenetreConteneur extends javax.swing.JFrame {
 
     private Conteneur<String, Personnel> cont;  // utilisation du conteneur generique
     private int total;      // nbre de personnels presents dans le conteneur
-
+    private AccesBdOracle inst;
     private enum TypePersonnel {
         EMPLOYE, COMMERCIAL, DIRECTEUR
     };
@@ -37,13 +45,25 @@ public class FenetreConteneur extends javax.swing.JFrame {
     private ModeCourant modeCourant;
 
     /** Contructeur par defaut ou l'on cree un nouveau conteneur */
-    public FenetreConteneur() {
+    public FenetreConteneur() throws SQLException, IOException{
 
         initComponents();
-        
+
         typePersonnel = TypePersonnel.EMPLOYE;
         // case cochee par defaut dans initComponents()
-        cont = new Conteneur<String, Personnel>();
+        inst = AccesBdOracle.getInstance();
+        
+        TreeMap<String, Personnel> tMap = new TreeMap<>();
+        
+        try {
+            inst.charger(tMap);
+        } catch (SQLException ex) {
+            showMessageDialog(this,"Problème de chargement de la base de données","Erreur",ERROR_MESSAGE);
+            Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        cont = new Conteneur<>(tMap);
+        cont.dernier();
         total = 0;
 
         // enregistrement des menus aupres de l'ecouteur dedie
@@ -602,6 +622,12 @@ public class FenetreConteneur extends javax.swing.JFrame {
               "Supprimer le personnel courant ?", "Confirmation",
               JOptionPane.YES_NO_OPTION);
       if (reponse == JOptionPane.YES_OPTION) {
+          try {
+                    inst.supprimer(cont.obtenir(tf_matricule.getText()).getNumPers());
+                } catch (SQLException ex) {
+                    showMessageDialog(this,"Problème de suppression de la base de données","Erreur",ERROR_MESSAGE);
+                    Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
+                }
           cont.supprimer(cont.cleCourante());
           afficher();
       } else {
@@ -613,9 +639,13 @@ public class FenetreConteneur extends javax.swing.JFrame {
 // on peut arriver a ce bouton pour 2 raisons : pour creer un nouveau Personnel
 // ou pour valider une saisie de Personnel en l'ajoutant au conteneur :
       if (bt_creer.getText().compareTo("AJOUTER") == 0) {
-          // on aurait pu faire un test sur modeCourant... si on a AJOUTER, on est en
-          // mode SAISIE : il faut ajouter le Personnel au conteneur
-          this.ajouter();
+          try {
+              // on aurait pu faire un test sur modeCourant... si on a AJOUTER, on est en
+              // mode SAISIE : il faut ajouter le Personnel au conteneur
+              this.ajouter();
+          } catch (IOException ex) {
+              Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
+          }
           this.modeAffichage(); // on bascule en mode Affichage apres chaque saisie
           this.afficher();
       } else { // on est en mode AFFICHAGE et on veut passer en mode Saisie
@@ -944,13 +974,13 @@ public class FenetreConteneur extends javax.swing.JFrame {
         }
     } // de saisir()
 
-    private void ajouter() {
+    private void ajouter() throws IOException {
         // rappel : dans le conteneur generique, ajouter met la clef courante sur
         // l'elt ajoute
         // on gere ici les eventuelles exceptions generees par la saisie :
         String nom, tel;
         float txh, nbh, pourc, ventes, indemn, prime;
-
+        Personnel p = null;
         nom = tf_nom.getText();
         tel = tf_tel.getText();
         Float numTel = tryParseFloat(tel);
@@ -977,22 +1007,22 @@ public class FenetreConteneur extends javax.swing.JFrame {
             if (typePersonnel == TypePersonnel.EMPLOYE) {
                 txh = this.tryParseFloat(tf_tauxhoraire.getText());
                 nbh = this.tryParseFloat(tf_nbheures.getText());
-                Employe emp = new Employe(nom, tel, txh, nbh);
-                cont.ajouter(emp.getNumPers(), emp);
+                p = new Employe(nom, tel, txh, nbh);
+                cont.ajouter(p.getNumPers(), (Employe)p);
 
             } else if (typePersonnel == TypePersonnel.COMMERCIAL) {
                 txh = this.tryParseFloat(tf_tauxhoraire.getText());
                 nbh = this.tryParseFloat(tf_nbheures.getText());
                 pourc = this.tryParseFloat(tf_pourcentage.getText());
                 ventes = this.tryParseFloat(tf_ventes.getText());
-                Commercial com = new Commercial(nom, tel, txh, nbh, pourc, ventes);
-                cont.ajouter(com.getNumPers(), com);
+                p = new Commercial(nom, tel, txh, nbh, pourc, ventes);
+                cont.ajouter(p.getNumPers(), (Commercial)p);
 
             } else {
                 indemn = this.tryParseFloat(tf_indemnites.getText());
                 prime = this.tryParseFloat(tf_prime.getText());
-                Directeur dir = new Directeur(nom, tel, indemn, prime);
-                cont.ajouter(dir.getNumPers(), dir);
+                p = new Directeur(nom, tel, indemn, prime);
+                cont.ajouter(p.getNumPers(), (Directeur)p);
             }
 
 
@@ -1000,6 +1030,12 @@ public class FenetreConteneur extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Erreur de saisie ou champs non "
                     + "remplis, recommencez !",
                     "Probleme dans la saisie", JOptionPane.WARNING_MESSAGE);
+        }
+         try {
+            inst.inserer(p);
+        } catch (SQLException ex) {
+            showMessageDialog(this,"Problème lors de l'insertion dans la base de données","Erreur",ERROR_MESSAGE);
+            Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     } // de ajouter()
@@ -1051,7 +1087,13 @@ public class FenetreConteneur extends javax.swing.JFrame {
 
             @Override
             public void run() {
-                new FenetreConteneur().setVisible(true);
+                try {
+                    new FenetreConteneur().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(FenetreConteneur.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
             }
         });
